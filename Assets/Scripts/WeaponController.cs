@@ -24,7 +24,7 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Transform muzzle;
     [SerializeField] private CameraController cameraController;
     [SerializeField] private ParticleSystem muzzleFlash;
-    
+
     // Attributes
     private Vector3 initialPosition;
     private Vector3 currentRecoilPosition;
@@ -91,7 +91,6 @@ public class WeaponController : MonoBehaviour
         // Ammo change.
         currentAmmo -= 1;
         OnMagAmmoChanged?.Invoke(currentAmmo);
-        print("Fired: " + currentAmmo + " remaining.");
     }
 
     void Reload()
@@ -112,12 +111,17 @@ public class WeaponController : MonoBehaviour
         remainingAmmo -= ammoToReload;
         OnMagAmmoChanged?.Invoke(currentAmmo);
         OnReloadFinished?.Invoke(remainingAmmo);
-        print("Reloaded: " + remainingAmmo + " remaining.");
     }
 
     void CalculateRecoil()
     {
         currentRecoilPosition = Vector3.Lerp(currentRecoilPosition, initialPosition, recoilReturnSpeed * Time.deltaTime);
         transform.localPosition = currentRecoilPosition;
+    }
+
+    public void AddAmmo(int amount)
+    {
+        remainingAmmo += amount;
+        OnReloadFinished?.Invoke(remainingAmmo);
     }
 }

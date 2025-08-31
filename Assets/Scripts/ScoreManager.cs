@@ -22,13 +22,12 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    public void UpdateScore(float baseScore, float timeToHit)
+    public void UpdateScore(float baseScore, float timeToHit = 1)
     {
         TotalScore += baseScore / timeToHit;
         TotalTimeToHit += timeToHit;
         NumTargets += 1;
         OnScoreChanged?.Invoke(TotalScore);
-        print("Current score: " + TotalScore + ", Average TTH: " + GetAverageTimeToHit() + ", Targets: " + NumTargets);
     }
 
     public float GetAverageTimeToHit()

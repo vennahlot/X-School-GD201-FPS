@@ -1,23 +1,28 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Attributes")]
+    [SerializeField] private float health = 100.0f;
+
     [Header("Basic Movement")]
     [SerializeField] private float moveSpeed = 5.0f;
-    
+
     [Header("Sprint")]
     [SerializeField] private float sprintSpeed = 10.0f;
     private bool isSprinting = false;
-    
+
     [Header("Crouch")]
     [SerializeField] private float crouchSpeed = 3.0f;
     [SerializeField] private float crouchHeight = 0.9f;
     private bool isCrouching = false;
-    
+
     [Header("Jump")]
     [SerializeField] private float jumpPower = 5.0f;
-    
+
     [Header("Camera")]
     [SerializeField] private float mouseSensitivity = 2000.0f;
     [SerializeField] private GameObject crosshair;
@@ -28,6 +33,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = 9.81f;
     [SerializeField] private float height = 1.8f;
 
+    [SerializeField] private GameObject damageOverlay;
+    [SerializeField] private GameObject gameOverOverlay;
+    public WeaponController weaponController;
     // Components
     private CharacterController controller;
 
@@ -37,10 +45,13 @@ public class PlayerController : MonoBehaviour
     private InputAction jumpAction;
     private InputAction crouchAction;
     private InputAction sprintAction;
-    
+
     // Private attributes
     private float rotateX = 0.0f;
     private Vector3 velocity = Vector3.zero;
+
+    // Events.
+    public static event Action<float> OnHealthChanged;
 
     void Awake()
     {
@@ -108,5 +119,29 @@ public class PlayerController : MonoBehaviour
         rotateX -= mouseY;
         rotateX = Mathf.Clamp(rotateX, -90.0f, 90.0f);
         cameraTransform.localRotation = Quaternion.Euler(rotateX, 0, 0);
+    }
+
+    public void TakeDamage(float damageAmount)
+    {
+        health -= damageAmount;
+        OnHealthChanged?.Invoke(health);
+        damageOverlay.SetActive(true);
+        StartCoroutine(HideDamageOverlay());
+        if (health <= 0)
+        {
+            gameOverOverlay.SetActive(true);
+        }
+    }
+
+    public void AddHealth(float amount)
+    {
+        health += amount;
+        OnHealthChanged?.Invoke(health);
+    }
+
+    IEnumerator HideDamageOverlay()
+    {
+        yield return new WaitForSeconds(1.0f);
+        damageOverlay.SetActive(false);
     }
 }
